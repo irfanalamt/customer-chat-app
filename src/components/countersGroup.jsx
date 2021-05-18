@@ -5,7 +5,7 @@ class Counters extends Component {
   state = {
     counterValues: [
       { id: 0, value: 5 },
-      { id: 1, value: 0 },
+      { id: 1, value: -1 },
       { id: 2, value: 6 },
       { id: 3, value: 78 },
     ],
