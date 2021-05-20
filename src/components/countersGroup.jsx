@@ -11,6 +11,15 @@ class Counters extends Component {
     ],
   };
 
+  handleIncrement = (counter) => {
+    console.log(counter);
+    const counters = [...this.state.counterValues];
+    const index = counters.indexOf(counter);
+    counters[index] = { ...counter };
+    counters[index].value++;
+    this.setState({ counterValues: counters });
+  };
+
   handleDelete = (counterID) => {
     console.log("Delete event handler called.", counterID);
     const counterValues = this.state.counterValues.filter(
@@ -19,11 +28,25 @@ class Counters extends Component {
     this.setState({ counterValues });
   };
 
+  handleDecrement = (counter) => {
+    const counters = [...this.state.counterValues];
+    const index = counters.indexOf(counter);
+    counters[index] = { ...counter };
+    counters[index].value -= 2;
+    this.setState({ counterValues: counters });
+  };
+
   render() {
     return (
       <div>
         {this.state.counterValues.map((c) => (
-          <Counter key={c.id} onDelete={this.handleDelete} counter={c} />
+          <Counter
+            key={c.id}
+            onDelete={this.handleDelete}
+            onIncrement={this.handleIncrement}
+            onDecrement={this.handleDecrement}
+            counter={c}
+          />
         ))}
       </div>
     );
