@@ -1,61 +1,51 @@
-import React, { Component } from "react";
-import NavBar from "./components/navbar";
-import Counters from "./components/countersGroup";
-import "bootstrap/dist/css/bootstrap.css";
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
 
-class App extends Component {
-  state = {
-    counterValues: [
-      { id: 0, value: 5 },
-      { id: 1, value: -1 },
-      { id: 2, value: 6 },
-      { id: 3, value: 78 },
-    ],
+let socket;
+
+const App = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [room, setRoom] = useState("");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    socket = io("localhost:3005/");
+  }, []);
+
+  const connectToRoom = () => {
+    socket.emit("join_room", { room, userName });
   };
 
-  handleIncrement = (counter) => {
-    console.log(counter);
-    const counters = [...this.state.counterValues];
-    const index = counters.indexOf(counter);
-    counters[index] = { ...counter };
-    counters[index].value++;
-    this.setState({ counterValues: counters });
-  };
-
-  handleDelete = (counterID) => {
-    console.log("Delete event handler called.", counterID);
-    const counterValues = this.state.counterValues.filter(
-      (c) => c.id !== counterID
-    );
-    this.setState({ counterValues });
-  };
-
-  handleDecrement = (counter) => {
-    const counters = [...this.state.counterValues];
-    const index = counters.indexOf(counter);
-    counters[index] = { ...counter };
-    counters[index].value -= 2;
-    this.setState({ counterValues: counters });
-  };
-  render() {
-    return (
-      <React.Fragment>
-        <NavBar
-          counterNav={
-            this.state.counterValues.filter((c) => c.value > 0).length
-          }
-        />
-        <main className="container">
-          <Counters
-            counterValues={this.state.counterValues}
-            onDelete={this.handleDelete}
-            onIncrement={this.handleIncrement}
-            onDecrement={this.handleDecrement}
+  return (
+    <div className="App">
+      {!loggedIn ? (
+        <div className="m-4 p-4 col-3">
+          <h1 className="display-6 m-2">NOT logged in</h1>
+          <input
+            className="form-control m-2 p-2"
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
+            type="text"
+            placeholder="Name"
           />
-        </main>
-      </React.Fragment>
-    );
-  }
-}
+          <input
+            className="form-control m-2 p-2"
+            onChange={(e) => {
+              setRoom(e.target.value);
+            }}
+            type="text"
+            placeholder="Room"
+          />
+          <button className="btn btn-primary m-2 p-2" onClick={connectToRoom}>
+            Enter Chat
+          </button>
+        </div>
+      ) : (
+        <h1 className="display-6">Logged IN!</h1>
+      )}
+    </div>
+  );
+};
 
 export default App;

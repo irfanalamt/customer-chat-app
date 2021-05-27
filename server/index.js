@@ -1,11 +1,22 @@
-const app = require("express")();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const express = require("express");
+const app = express();
+app.use(express.json());
 
-io.on("connection", (socket) => {
-  socket.on("message", ({ name }) => {
-    io.emit("message", { name, message });
-  });
+const httpServer = require("http").createServer();
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
-http.listen(4000, () => console.log("Listening on port 4000"));
+httpServer.listen(3005, () => console.log("Listening on port 3005"));
+
+io.on("connection", (socket) => {
+  console.log("socket connected" + " socket ID=" + socket.id);
+  socket.on("join_room", ({ room, userName }) => {
+    socket.join(room);
+    console.log("Joined room:" + room + "Username:" + userName);
+  });
+  socket.on("disconnect", () => console.log("User disconnected."));
+});
