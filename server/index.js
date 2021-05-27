@@ -18,5 +18,11 @@ io.on("connection", (socket) => {
     socket.join(room);
     console.log("Joined room:" + room + "Username:" + userName);
   });
+
+  socket.on("send_message", ({ room, userName, message }) => {
+    console.log("Send message event triggered:" + room + userName + message);
+    socket.to(room).emit("receive_message", { userName, message });
+  });
+
   socket.on("disconnect", () => console.log("User disconnected."));
 });

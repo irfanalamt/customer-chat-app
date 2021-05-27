@@ -8,12 +8,28 @@ const App = () => {
   const [room, setRoom] = useState("");
   const [userName, setUserName] = useState("");
 
+  const [message, setMessage] = useState("");
+  const [messageList, setMessageList] = useState([]);
+
   useEffect(() => {
     socket = io("localhost:3005/");
   }, []);
 
+  useEffect(() => {
+    socket.on("receive_message", ({ userName, message }) => {
+      setMessageList([...messageList, { userName, message }]);
+    });
+  }, [messageList]);
+
   const connectToRoom = () => {
     socket.emit("join_room", { room, userName });
+    setLoggedIn(true);
+  };
+
+  const sendMessage = () => {
+    socket.emit("send_message", { room, userName, message });
+    setMessageList([...messageList, { userName, message }]);
+    setMessage("");
   };
 
   return (
@@ -42,7 +58,34 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <h1 className="display-6">Logged IN!</h1>
+        <React.Fragment>
+          <h1 className="display-6">Logged IN!</h1>
+          <div className="chatContainer container m-4 col-4">
+            <div className="messages">
+              {messageList.map((m) => {
+                return (
+                  <h1>
+                    {m.userName}
+                    {m.message}
+                  </h1>
+                );
+              })}
+            </div>
+            <div className="messageInputs">
+              <input
+                className="form-control m-3"
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
+                type="text"
+                placeholder="Enter message.."
+              />
+              <button onClick={sendMessage} className="btn btn-success ms-3">
+                SEND
+              </button>
+            </div>
+          </div>
+        </React.Fragment>
       )}
     </div>
   );
